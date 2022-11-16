@@ -14,7 +14,7 @@ class MifarUltralightInfo(tag : MifareUltralight) {
     val atqa: String
     val sak: Int
     val data: String
-    //val write : Unit
+    val write : Unit
 
     init {
         type = tag.type
@@ -26,7 +26,7 @@ class MifarUltralightInfo(tag : MifareUltralight) {
         sak = nfca.sak.toInt()
         // Read memory data
         data = readData(tag)
-        //write = writeData(tag)
+        write = writeData(tag)
     }
 
     private fun readData(tag: MifareUltralight): String {
@@ -45,17 +45,32 @@ class MifarUltralightInfo(tag : MifareUltralight) {
             // Read every fourth page, as 4 pages are read at a time by `readPages()`
             for (currentPage in 0 until readablePagesCount) {
                 if (currentPage % 4 == 0) dataAccumulator += tag.readPages(currentPage).toHex()
-                Log.d("tagaaaf","${tag.readPages(currentPage)}")
             }
+            Log.d("tagaaaf",tag.readPages(0).toHex())
+            Log.d("tagaaaf",tag.readPages(1).toHex())
+            Log.d("tagaaaf",tag.readPages(2).toHex())
+            Log.d("tagaaaf",tag.readPages(3).toHex())
+            Log.d("tagaaaf",tag.readPages(4).toHex())
+            Log.d("tagaaaf",tag.readPages(5).toHex())
 
             tag.close()
-
             return dataAccumulator
-
         } catch (e: IOException) {
             e.localizedMessage?.let { Log.e("MifareUltralightHelper", it) }
             return ""
         }
+    }
+
+     fun writeData(tag: MifareUltralight){
+        tag.connect()
+         Log.d("tagagaa","tagagaga")
+        Charset.forName("US-ASCII").also { usAscii ->
+            tag.writePage(1, "abcd".toByteArray(usAscii))
+            tag.writePage(2, "efgh".toByteArray(usAscii))
+            tag.writePage(3, "ijkl".toByteArray(usAscii))
+            tag.writePage(4, "mnop".toByteArray(usAscii))
+        }
+         tag.close()
     }
 
 }
